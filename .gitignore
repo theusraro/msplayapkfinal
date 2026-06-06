@@ -1,0 +1,34 @@
+# Dependências
+node_modules/
+
+# Build web
+/dist/
+/build/
+
+# Capacitor / Android
+android/.gradle/
+android/app/build/
+android/build/
+android/.idea/
+android/local.properties
+*.apk
+*.aab
+
+# iOS / Xcode
+ios/App/build/
+ios/App/Pods/
+ios/App/DerivedData/
+ios/App/*.xcuserdata/
+ios/App/*.xcworkspace/xcuserdata/
+ios/App/Podfile.lock
+*.ipa
+*.xcarchive
+
+# Ambiente
+.env
+.env.local
+.DS_Store
+Thumbs.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

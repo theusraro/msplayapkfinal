@@ -1,0 +1,36 @@
+MSPLAY — SERVIDORES CONFIGURADOS COM FAILOVER
+
+A tela inicial de login agora mostra somente:
+- Usuário
+- Senha
+
+O link/DNS não aparece mais para o cliente.
+
+DNS configurados em ordem de prioridade:
+
+DNS XCIPTV:
+1. http://alerquinaz.top:80
+2. http://newxczs.top:80
+3. http://p2golld.top:80
+4. http://zed3.top:80
+
+DNS ALTERNATIVA:
+5. http://alerquinaz.top
+6. http://p2golld.top
+7. http://zed3.top
+
+Como funciona:
+- O usuário digita apenas usuário e senha.
+- O app testa automaticamente cada DNS acima.
+- Se um DNS falhar, tenta o próximo.
+- Ao conectar, salva o servidor que funcionou.
+- No player, gera URLs de stream usando todos os DNS como fallback.
+
+Arquivo principal alterado:
+src/config/servers.js
+
+Tela alterada sem mudar a identidade visual:
+src/pages/LoginPage.jsx
+
+Serviço de failover alterado:
+src/services/failoverService.js

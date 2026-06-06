@@ -1,0 +1,34 @@
+ERRO: Could not read script android/capacitor.settings.gradle as it does not exist
+
+CAUSA:
+A pasta android foi gerada incompleta/quebrada. O Capacitor deveria criar o arquivo:
+android/capacitor.settings.gradle
+mas ele nao foi criado.
+
+CORRECAO RECOMENDADA:
+1) Feche o Android Studio.
+2) Abra o CMD na pasta msplay.
+3) Rode:
+
+CORRIGIR_ERRO_BUILD_APK.bat
+
+OU manualmente:
+
+rmdir /s /q android
+npm install
+npm run build
+npx cap add android
+npx cap sync android
+npx cap open android
+
+IMPORTANTE:
+Nao mexe na interface. Isso apenas recria a pasta Android corretamente.
+
+APK DEBUG:
+Depois de abrir/sincronizar:
+
+cd android
+gradlew.bat assembleDebug
+
+O APK sai em:
+android\app\build\outputs\apk\debug\app-debug.apk

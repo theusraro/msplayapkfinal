@@ -1,0 +1,42 @@
+MSPLAY — GERAR APK NO WINDOWS
+
+Pré-requisitos:
+1. Node.js instalado
+2. Android Studio instalado
+3. Java/JDK configurado corretamente
+   - Preferencial: usar o JBR do Android Studio se o Gradle reclamar do Java
+
+PASSO A PASSO:
+
+1) Abra o Prompt/CMD na pasta do projeto:
+cd C:\Users\User\Downloads\MSPlay_APK_READY\msplay
+
+2) Instale as dependências:
+npm install
+
+3) Gere o build web:
+npm run build
+
+4) Adicione o Android ao projeto:
+npx cap add android
+
+Se o Android já tiver sido adicionado alguma vez, use:
+npx cap sync android
+
+5) Abra no Android Studio:
+npx cap open android
+
+6) No Android Studio:
+Build > Generate Signed App Bundle / APK > APK
+
+PARA APK DE TESTE/DEBUG:
+Depois de adicionar Android:
+cd android
+gradlew.bat assembleDebug
+
+O APK de teste geralmente fica em:
+android\app\build\outputs\apk\debug\app-debug.apk
+
+NÃO MODIFICAR INTERFACE:
+Para trocar servidor, altere somente:
+src\config\servers.js

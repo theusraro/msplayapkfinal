@@ -1,0 +1,152 @@
+import { SERVERS, FAILOVER_CONFIG } from '../config/servers.js'
+import { authenticate } from './xtreamApi.js'
+import { fetchAndParseM3U } from './m3uParser.js'
+
+const delay = (ms) => new Promise(res => setTimeout(res, ms))
+
+class FailoverService {
+  constructor() {
+    this.baseServers = SERVERS.filter(s => s.active).sort((a, b) => a.priority - b.priority)
+    this.credentials = { username: '', password: '' }
+    this.servers = this.withCredentials(this.baseServers)
+    this.currentIndex = 0
+    this.failLog = []
+    this.listeners = []
+  }
+
+  // Aplica usuário/senha digitados na tela de login a todos os DNS configurados.
+  setCredentials(username = '', password = '') {
+    this.credentials = { username, password }
+    this.servers = this.withCredentials(this.baseServers)
+  }
+
+  withCredentials(servers = []) {
+    return servers.map(server => {
+      if (server.type !== 'xtream') return server
+      return {
+        ...server,
+        username: server.username || this.credentials.username,
+        password: server.password || this.credentials.password,
+        port: server.port || '80',
+      }
+    })
+  }
+
+  // Servidor ativo atual
+  getCurrentServer() {
+    return this.servers[this.currentIndex] || null
+  }
+
+  // Próximo servidor disponível
+  getNextServer() {
+    if (this.currentIndex + 1 < this.servers.length) {
+      this.currentIndex++
+      return this.servers[this.currentIndex]
+    }
+    return null
+  }
+
+  // Reseta para o servidor principal
+  reset() {
+    this.currentIndex = 0
+  }
+
+  // Registra falha
+  logFailure(server, reason) {
+    this.failLog.push({
+      serverId: server.id,
+      serverName: server.name,
+      serverUrl: server.url || server.m3uUrl,
+      reason,
+      timestamp: new Date().toISOString(),
+    })
+    console.warn(`[MSPlay Failover] Servidor "${server.name}" falhou: ${reason}`)
+  }
+
+  // Tenta autenticar em ordem de prioridade usando o mesmo usuário/senha em todos os DNS.
+  async tryLoginSequential(credentials = null) {
+    if (credentials?.username || credentials?.password) {
+      this.setCredentials(credentials.username, credentials.password)
+    }
+
+    const targets = this.servers
+
+    for (let i = 0; i < targets.length; i++) {
+      const server = targets[i]
+
+      if (server.type === 'm3u') {
+        try {
+          await fetchAndParseM3U(server.m3uUrl)
+          this.currentIndex = this.servers.findIndex(s => s.id === server.id)
+          return { server, type: 'm3u' }
+        } catch (err) {
+          this.logFailure(server, err.message)
+          continue
+        }
+      }
+
+      for (let attempt = 0; attempt < FAILOVER_CONFIG.maxRetries; attempt++) {
+        try {
+          const data = await authenticate(server)
+          this.currentIndex = this.servers.findIndex(s => s.id === server.id)
+          return { server, userInfo: data.user_info, type: 'xtream' }
+        } catch (err) {
+          if (attempt < FAILOVER_CONFIG.maxRetries - 1) {
+            await delay(FAILOVER_CONFIG.retryDelayMs)
+          } else {
+            this.logFailure(server, err.message)
+          }
+        }
+      }
+    }
+
+    throw new Error('Todos os DNS falharam. Verifique usuário, senha e conexão.')
+  }
+
+  // Constrói URLs com failover para stream.
+  // Para TV ao vivo usamos mais de um formato por DNS, porque alguns
+  // painéis Xtream entregam em /usuario/senha/id e outros em /live/...
+  // Isso evita o erro de "conexão instável" quando o login funciona,
+  // mas o formato do link do canal muda entre servidores.
+  buildStreamUrls(streamId, type = 'live', ext = 'mp4') {
+    const urls = []
+
+    this.servers
+      .filter(s => s.type === 'xtream')
+      .forEach(server => {
+        const base = `${server.url}`.replace(/\/+$/, '')
+        const u = encodeURIComponent(server.username || this.credentials.username || '')
+        const p = encodeURIComponent(server.password || this.credentials.password || '')
+
+        if (type === 'live') {
+          urls.push(`${base}/${u}/${p}/${streamId}`)
+          urls.push(`${base}/live/${u}/${p}/${streamId}.ts`)
+          urls.push(`${base}/live/${u}/${p}/${streamId}.m3u8`)
+          urls.push(`${base}/${u}/${p}/${streamId}.m3u8`)
+          return
+        }
+
+        if (type === 'movie') {
+          urls.push(`${base}/movie/${u}/${p}/${streamId}.${ext || 'mp4'}`)
+          return
+        }
+
+        if (type === 'series') {
+          urls.push(`${base}/series/${u}/${p}/${streamId}.${ext || 'mp4'}`)
+          return
+        }
+
+        urls.push(`${base}/${u}/${p}/${streamId}`)
+      })
+
+    return [...new Set(urls)]
+  }
+
+  getLog() {
+    return this.failLog
+  }
+}
+
+// Singleton
+export const failoverService = new FailoverService()
+export default failoverService

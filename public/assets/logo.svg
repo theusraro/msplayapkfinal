@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 60" width="220" height="60">
+  <defs>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF1A27;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B81D24;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.15" />
+      <stop offset="50%" style="stop-color:#ffffff;stop-opacity:0.05" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="logoClip">
+      <rect x="0" y="0" width="220" height="60"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background pill -->
+  <rect x="0" y="0" width="220" height="60" rx="8" fill="#0A0A0A"/>
+
+  <!-- Play triangle integrado ao M -->
+  <g filter="url(#glow)">
+    <!-- M estilizado -->
+    <path d="M8 48 L8 12 L22 12 L33 32 L44 12 L58 12 L58 48 L48 48 L48 26 L36 46 L30 46 L18 26 L18 48 Z" fill="url(#redGrad)"/>
+    <!-- Play triangle no interior do M -->
+    <polygon points="24,20 24,38 38,29" fill="white" opacity="0.95"/>
+  </g>
+
+  <!-- "S" -->
+  <text x="68" y="47" font-family="'Bebas Neue', sans-serif" font-size="42" fill="url(#redGrad)" filter="url(#glow)">S</text>
+
+  <!-- "Play" -->
+  <text x="93" y="47" font-family="'Bebas Neue', sans-serif" font-size="42" fill="white">Play</text>
+
+  <!-- Shine overlay -->
+  <rect x="0" y="0" width="220" height="60" rx="8" fill="url(#metalGrad)"/>
+
+  <!-- Scan line animation -->
+  <rect x="-220" y="0" width="80" height="60" rx="8" fill="white" opacity="0.06">
+    <animateTransform attributeName="transform" type="translate" from="0 0" to="440 0" dur="3s" repeatCount="indefinite" begin="1s"/>
+  </rect>
+</svg>
