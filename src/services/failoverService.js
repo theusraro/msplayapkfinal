@@ -70,6 +70,7 @@ class FailoverService {
       this.setCredentials(credentials.username, credentials.password)
     }
 
+    this.failLog = []
     const targets = this.servers
 
     for (let i = 0; i < targets.length; i++) {
@@ -101,7 +102,12 @@ class FailoverService {
       }
     }
 
-    throw new Error('Todos os DNS falharam. Verifique usuário, senha e conexão.')
+    const details = this.failLog
+      .slice(-4)
+      .map(item => `${item.serverName}: ${item.reason}`)
+      .join(' | ')
+
+    throw new Error(`Todos os DNS falharam. ${details || 'Verifique usuario, senha e conexao.'}`)
   }
 
   // Constrói URLs com failover para stream.
