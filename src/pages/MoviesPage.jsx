@@ -75,7 +75,7 @@ const MoviesPage = () => {
             value={sort}
             onChange={e => setSort(e.target.value)}
             className="bg-surface border border-border rounded-lg px-3 py-2 text-sm text-white
-              focus:outline-none focus:border-primary font-dm cursor-pointer"
+              focus:outline-none focus:border-primary font-dm cursor-pointer focus-tv"
           >
             {SORT_OPTIONS.map(o => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -114,7 +114,7 @@ const MoviesPage = () => {
           <div className="text-center py-20">
             <p className="text-muted text-lg">Nenhum filme encontrado</p>
             {search && (
-              <button onClick={() => setSearch('')} className="mt-3 text-primary text-sm hover:underline">
+              <button onClick={() => setSearch('')} className="mt-3 text-primary text-sm hover:underline focus-tv rounded-md px-2 py-1">
                 Limpar busca
               </button>
             )}

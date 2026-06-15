@@ -110,6 +110,7 @@ class FailoverService {
   // mas o formato do link do canal muda entre servidores.
   buildStreamUrls(streamId, type = 'live', ext = 'mp4') {
     const urls = []
+    const extensions = [...new Set([ext, 'mp4', 'mkv', 'avi', 'ts'].filter(Boolean))]
 
     this.servers
       .filter(s => s.type === 'xtream')
@@ -119,20 +120,25 @@ class FailoverService {
         const p = encodeURIComponent(server.password || this.credentials.password || '')
 
         if (type === 'live') {
-          urls.push(`${base}/${u}/${p}/${streamId}`)
-          urls.push(`${base}/live/${u}/${p}/${streamId}.ts`)
           urls.push(`${base}/live/${u}/${p}/${streamId}.m3u8`)
+          urls.push(`${base}/live/${u}/${p}/${streamId}.ts`)
           urls.push(`${base}/${u}/${p}/${streamId}.m3u8`)
+          urls.push(`${base}/${u}/${p}/${streamId}.ts`)
+          urls.push(`${base}/${u}/${p}/${streamId}`)
           return
         }
 
         if (type === 'movie') {
-          urls.push(`${base}/movie/${u}/${p}/${streamId}.${ext || 'mp4'}`)
+          extensions.forEach(extension => {
+            urls.push(`${base}/movie/${u}/${p}/${streamId}.${extension}`)
+          })
           return
         }
 
         if (type === 'series') {
-          urls.push(`${base}/series/${u}/${p}/${streamId}.${ext || 'mp4'}`)
+          extensions.forEach(extension => {
+            urls.push(`${base}/series/${u}/${p}/${streamId}.${extension}`)
+          })
           return
         }
 

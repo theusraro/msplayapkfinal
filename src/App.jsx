@@ -9,6 +9,7 @@ import SeriesPage from './pages/SeriesPage.jsx'
 import LiveTVPage from './pages/LiveTVPage.jsx'
 import PlayerPage from './pages/PlayerPage.jsx'
 import useAppStore from './store/appStore.js'
+import useRemoteNavigation from './hooks/useRemoteNavigation.js'
 
 // Rota protegida
 const ProtectedRoute = ({ children }) => {
@@ -17,6 +18,8 @@ const ProtectedRoute = ({ children }) => {
 }
 
 const App = () => {
+  useRemoteNavigation()
+
   return (
     <BrowserRouter>
       <Routes>

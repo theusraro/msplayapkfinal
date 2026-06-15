@@ -35,6 +35,15 @@ const VideoPlayer = ({ urls = [], title = '', type = 'live', onBack, onProgress 
 
   const { addToast, preferences, setPreference, updateProgress } = useAppStore()
 
+  const canUseNativeHls = useCallback(() => {
+    const video = videoRef.current
+    if (!video) return false
+    return Boolean(
+      video.canPlayType('application/vnd.apple.mpegurl') ||
+      video.canPlayType('application/x-mpegURL')
+    )
+  }, [])
+
   const setUrlIndex = (index) => {
     urlIndexRef.current = index
     setUrlIndexState(index)
@@ -124,6 +133,13 @@ const VideoPlayer = ({ urls = [], title = '', type = 'live', onBack, onProgress 
       }
     }, FAILOVER_CONFIG.timeoutMs + 4000)
 
+    if (isHlsUrl && canUseNativeHls()) {
+      video.src = url
+      video.load()
+      playVideo()
+      return
+    }
+
     if (isHlsUrl && Hls.isSupported()) {
       const hls = new Hls({
         enableWorker: true,
@@ -164,7 +180,7 @@ const VideoPlayer = ({ urls = [], title = '', type = 'live', onBack, onProgress 
     video.src = url
     video.load()
     playVideo()
-  }, [urls, cleanupCurrentStream, playVideo, tryNextServer])
+  }, [urls, cleanupCurrentStream, playVideo, tryNextServer, canUseNativeHls])
 
   const resetStallTimer = useCallback(() => {
     clearTimeout(stallTimer.current)

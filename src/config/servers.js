@@ -70,8 +70,8 @@ export const SERVERS = [
 // ─── CONFIGURAÇÕES DO SISTEMA DE FAILOVER ────────────────────
 export const FAILOVER_CONFIG = {
   timeoutMs: 8000,       // Tempo (ms) para considerar falha de conexão
-  stallTimeoutMs: 15000, // Tempo (ms) de stream travado antes de trocar servidor
-  maxRetries: 2,         // Tentativas por servidor antes de trocar
+  stallTimeoutMs: 1200, // Tempo (ms) de stream travado antes de trocar servidor
+  maxRetries: 3,         // Tentativas por servidor antes de trocar
   retryDelayMs: 1200,    // Espera (ms) entre tentativas
   autoSwitch: true,      // Troca automática de servidor
   showNotification: true,// Mostrar toast ao trocar servidor

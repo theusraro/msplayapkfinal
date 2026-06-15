@@ -114,7 +114,7 @@ const LoginPage = () => {
                 type="text"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
-                placeholder="seu_usuario"
+                placeholder="usuario"
                 className="input-field"
                 disabled={loading}
                 autoComplete="username"
@@ -128,7 +128,7 @@ const LoginPage = () => {
                   type={showPass ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="sua_senha"
+                  placeholder="senha"
                   className="input-field pr-10"
                   disabled={loading}
                   autoComplete="current-password"

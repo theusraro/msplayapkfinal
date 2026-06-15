@@ -8,6 +8,7 @@ const ContentCard = ({ item, type = 'movie', ratio = 'landscape' }) => {
   const navigate = useNavigate()
   const { toggleFavorite, isFavorite, addToast } = useAppStore()
   const [hovered, setHovered] = useState(false)
+  const [focused, setFocused] = useState(false)
   const [imgError, setImgError] = useState(false)
 
   const isLive = type === 'live'
@@ -18,6 +19,13 @@ const ContentCard = ({ item, type = 'movie', ratio = 'landscape' }) => {
   const handlePlay = (e) => {
     e.stopPropagation()
     navigate('/player', { state: { item, type } })
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      handlePlay(e)
+    }
   }
 
   const handleFav = (e) => {
@@ -34,14 +42,16 @@ const ContentCard = ({ item, type = 'movie', ratio = 'landscape' }) => {
 
   return (
     <div
-      className={`relative flex-shrink-0 rounded-lg overflow-hidden cursor-pointer group
-        transition-all duration-300 hover:scale-105 hover:z-10 bg-surface`}
+      className={`relative flex-shrink-0 rounded-lg overflow-hidden cursor-pointer group focus-tv
+        transition-all duration-200 hover:scale-105 focus-visible:scale-105 hover:z-10 focus-visible:z-10 bg-surface`}
       style={{ width: ratio === 'portrait' ? '140px' : '220px' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
       onClick={handlePlay}
       tabIndex={0}
-      onKeyDown={e => e.key === 'Enter' && handlePlay(e)}
+      onKeyDown={handleKeyDown}
       role="button"
       aria-label={`Assistir ${item.name}`}
     >
@@ -88,19 +98,21 @@ const ContentCard = ({ item, type = 'movie', ratio = 'landscape' }) => {
 
         {/* Hover overlay */}
         <div className={`absolute inset-0 bg-black/70 flex items-center justify-center gap-2
-          transition-opacity duration-200 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
+          transition-opacity duration-200 ${hovered || focused ? 'opacity-100' : 'opacity-0'}`}>
           <button
             onClick={handlePlay}
-            className="w-10 h-10 rounded-full bg-primary hover:bg-secondary flex items-center justify-center
+            className="w-10 h-10 rounded-full bg-primary hover:bg-secondary flex items-center justify-center focus-tv
               transition-transform hover:scale-110"
+            aria-label={`Assistir ${item.name}`}
           >
             <Play size={18} fill="white" className="text-white ml-0.5" />
           </button>
           <button
             onClick={handleFav}
             className={`w-9 h-9 rounded-full border-2 flex items-center justify-center
-              transition-all hover:scale-110
+              transition-all hover:scale-110 focus-tv
               ${fav ? 'border-primary bg-primary/20' : 'border-white/40 bg-black/40 hover:border-white'}`}
+            aria-label={fav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
           >
             <Heart
               size={15}

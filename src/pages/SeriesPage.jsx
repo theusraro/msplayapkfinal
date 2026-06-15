@@ -26,7 +26,7 @@ const SeriesModal = ({ series, onClose }) => {
       <div className="relative bg-surface border border-border rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden">
         <button onClick={onClose}
           className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center
-            text-white hover:bg-black/80 transition-colors">
+            text-white hover:bg-black/80 transition-colors focus-tv">
           <X size={16} />
         </button>
 
@@ -56,7 +56,7 @@ const SeriesModal = ({ series, onClose }) => {
                     <button
                       key={s}
                       onClick={() => setSeason(Number(s))}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border font-dm
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border font-dm focus-tv
                         ${Number(s) === season ? 'bg-primary border-primary text-white' : 'border-border text-muted hover:text-white'}`}
                     >
                       Temporada {s}
@@ -75,7 +75,7 @@ const SeriesModal = ({ series, onClose }) => {
                       onClose()
                     }}
                     className="w-full flex items-center gap-3 p-3 rounded-lg bg-elevated hover:bg-white/10
-                      transition-colors text-left group"
+                      transition-colors text-left group focus-tv"
                   >
                     <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center flex-shrink-0
                       group-hover:bg-primary transition-colors">
@@ -158,9 +158,10 @@ const SeriesPage = () => {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {filtered.map(s => (
-              <div
+              <button
                 key={s.series_id}
-                className="cursor-pointer group"
+                type="button"
+                className="cursor-pointer group text-left focus-tv rounded-lg"
                 onClick={() => setSelected(s)}
               >
                 <div className="aspect-[2/3] rounded-lg overflow-hidden bg-elevated relative">
@@ -180,7 +181,7 @@ const SeriesPage = () => {
                   </div>
                 </div>
                 <p className="text-white text-xs font-medium mt-2 truncate">{s.name}</p>
-              </div>
+              </button>
             ))}
           </div>
         )}

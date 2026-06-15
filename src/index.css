@@ -32,6 +32,7 @@
   body {
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   /* Scrollbar customizado */
@@ -192,10 +193,54 @@
   animation: toastOut 0.3s ease-in forwards;
 }
 
-/* Focus styles para Smart TV */
-*:focus-visible {
-  outline: 2px solid var(--cor-primaria);
-  outline-offset: 2px;
+/* Focus styles para Smart TV, TV box e controle remoto */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible,
+.focus-tv:focus-visible {
+  outline: 3px solid var(--cor-primaria);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(229, 9, 20, 0.22);
+}
+
+.top-nav-link:focus-visible,
+.top-nav-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+button,
+a,
+[role="button"],
+input,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+[role="button"] {
+  touch-action: manipulation;
+}
+
+@media (hover: none) {
+  .hover\:scale-105:hover,
+  .md\:hover\:scale-105:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Hero banner gradient */
