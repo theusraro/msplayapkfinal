@@ -2,14 +2,29 @@ import axios from 'axios'
 import { FAILOVER_CONFIG } from '../config/servers.js'
 import { proxifyUrl } from './proxyUrl.js'
 
-const createClient = (baseURL) =>
-  axios.create({ baseURL: proxifyUrl(baseURL), timeout: FAILOVER_CONFIG.timeoutMs })
+const buildXtreamApiUrl = (baseUrl, params = {}) => {
+  const cleanBase = `${baseUrl}`.replace(/\/+$/, '')
+  const query = new URLSearchParams()
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      query.set(key, value)
+    }
+  })
+
+  return proxifyUrl(`${cleanBase}/player_api.php?${query.toString()}`)
+}
+
+const requestXtream = async (baseUrl, params = {}) => {
+  const { data } = await axios.get(buildXtreamApiUrl(baseUrl, params), {
+    timeout: FAILOVER_CONFIG.timeoutMs,
+  })
+  return data
+}
 
 export const authenticate = async (server) => {
   const { url, username, password } = server
-  const { data } = await createClient(url).get('/player_api.php', {
-    params: { username, password },
-  })
+  const data = await requestXtream(url, { username, password })
 
   if (!data?.user_info || data.user_info.auth === 0) {
     throw new Error('Credenciais invalidas')
@@ -20,9 +35,7 @@ export const authenticate = async (server) => {
 
 export const getLiveCategories = async (server) => {
   const { url, username, password } = server
-  const { data } = await createClient(url).get('/player_api.php', {
-    params: { username, password, action: 'get_live_categories' },
-  })
+  const data = await requestXtream(url, { username, password, action: 'get_live_categories' })
   return data || []
 }
 
@@ -30,7 +43,7 @@ export const getLiveStreams = async (server, categoryId = '') => {
   const { url, username, password } = server
   const params = { username, password, action: 'get_live_streams' }
   if (categoryId) params.category_id = categoryId
-  const { data } = await createClient(url).get('/player_api.php', { params })
+  const data = await requestXtream(url, params)
   return data || []
 }
 
@@ -41,9 +54,7 @@ export const getLiveStreamUrl = (server, streamId) => {
 
 export const getVodCategories = async (server) => {
   const { url, username, password } = server
-  const { data } = await createClient(url).get('/player_api.php', {
-    params: { username, password, action: 'get_vod_categories' },
-  })
+  const data = await requestXtream(url, { username, password, action: 'get_vod_categories' })
   return data || []
 }
 
@@ -51,15 +62,13 @@ export const getVodStreams = async (server, categoryId = '') => {
   const { url, username, password } = server
   const params = { username, password, action: 'get_vod_streams' }
   if (categoryId) params.category_id = categoryId
-  const { data } = await createClient(url).get('/player_api.php', { params })
+  const data = await requestXtream(url, params)
   return data || []
 }
 
 export const getVodInfo = async (server, vodId) => {
   const { url, username, password } = server
-  const { data } = await createClient(url).get('/player_api.php', {
-    params: { username, password, action: 'get_vod_info', vod_id: vodId },
-  })
+  const data = await requestXtream(url, { username, password, action: 'get_vod_info', vod_id: vodId })
   return data || {}
 }
 
@@ -70,9 +79,7 @@ export const getVodStreamUrl = (server, streamId, ext = 'mp4') => {
 
 export const getSeriesCategories = async (server) => {
   const { url, username, password } = server
-  const { data } = await createClient(url).get('/player_api.php', {
-    params: { username, password, action: 'get_series_categories' },
-  })
+  const data = await requestXtream(url, { username, password, action: 'get_series_categories' })
   return data || []
 }
 
@@ -80,15 +87,13 @@ export const getSeries = async (server, categoryId = '') => {
   const { url, username, password } = server
   const params = { username, password, action: 'get_series' }
   if (categoryId) params.category_id = categoryId
-  const { data } = await createClient(url).get('/player_api.php', { params })
+  const data = await requestXtream(url, params)
   return data || []
 }
 
 export const getSeriesInfo = async (server, seriesId) => {
   const { url, username, password } = server
-  const { data } = await createClient(url).get('/player_api.php', {
-    params: { username, password, action: 'get_series_info', series_id: seriesId },
-  })
+  const data = await requestXtream(url, { username, password, action: 'get_series_info', series_id: seriesId })
   return data || {}
 }
 
@@ -100,9 +105,7 @@ export const getEpisodeUrl = (server, episodeId, ext = 'mp4') => {
 export const getShortEPG = async (server, streamId, limit = 4) => {
   const { url, username, password } = server
   try {
-    const { data } = await createClient(url).get('/player_api.php', {
-      params: { username, password, action: 'get_short_epg', stream_id: streamId, limit },
-    })
+    const data = await requestXtream(url, { username, password, action: 'get_short_epg', stream_id: streamId, limit })
     return data?.epg_listings || []
   } catch {
     return []
