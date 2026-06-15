@@ -1,6 +1,7 @@
 import { SERVERS, FAILOVER_CONFIG } from '../config/servers.js'
 import { authenticate } from './xtreamApi.js'
 import { fetchAndParseM3U } from './m3uParser.js'
+import { proxifyUrl } from './proxyUrl.js'
 
 const delay = (ms) => new Promise(res => setTimeout(res, ms))
 
@@ -145,7 +146,7 @@ class FailoverService {
         urls.push(`${base}/${u}/${p}/${streamId}`)
       })
 
-    return [...new Set(urls)]
+    return [...new Set(urls)].map(proxifyUrl)
   }
 
   getLog() {

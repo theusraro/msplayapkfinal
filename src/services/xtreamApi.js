@@ -1,24 +1,23 @@
 import axios from 'axios'
 import { FAILOVER_CONFIG } from '../config/servers.js'
+import { proxifyUrl } from './proxyUrl.js'
 
-// Cria instância axios com timeout configurado
 const createClient = (baseURL) =>
-  axios.create({ baseURL, timeout: FAILOVER_CONFIG.timeoutMs })
+  axios.create({ baseURL: proxifyUrl(baseURL), timeout: FAILOVER_CONFIG.timeoutMs })
 
-// ── Autenticação ─────────────────────────────────────────────
 export const authenticate = async (server) => {
   const { url, username, password } = server
-  const client = createClient(url)
-  const { data } = await client.get('/player_api.php', {
+  const { data } = await createClient(url).get('/player_api.php', {
     params: { username, password },
   })
+
   if (!data?.user_info || data.user_info.auth === 0) {
-    throw new Error('Credenciais inválidas')
+    throw new Error('Credenciais invalidas')
   }
+
   return data
 }
 
-// ── Live TV ───────────────────────────────────────────────────
 export const getLiveCategories = async (server) => {
   const { url, username, password } = server
   const { data } = await createClient(url).get('/player_api.php', {
@@ -37,10 +36,9 @@ export const getLiveStreams = async (server, categoryId = '') => {
 
 export const getLiveStreamUrl = (server, streamId) => {
   const { url, username, password } = server
-  return `${url}/${username}/${password}/${streamId}`
+  return proxifyUrl(`${url}/${username}/${password}/${streamId}`)
 }
 
-// ── VOD (Filmes) ──────────────────────────────────────────────
 export const getVodCategories = async (server) => {
   const { url, username, password } = server
   const { data } = await createClient(url).get('/player_api.php', {
@@ -67,10 +65,9 @@ export const getVodInfo = async (server, vodId) => {
 
 export const getVodStreamUrl = (server, streamId, ext = 'mp4') => {
   const { url, username, password } = server
-  return `${url}/movie/${username}/${password}/${streamId}.${ext}`
+  return proxifyUrl(`${url}/movie/${username}/${password}/${streamId}.${ext}`)
 }
 
-// ── Séries ────────────────────────────────────────────────────
 export const getSeriesCategories = async (server) => {
   const { url, username, password } = server
   const { data } = await createClient(url).get('/player_api.php', {
@@ -97,10 +94,9 @@ export const getSeriesInfo = async (server, seriesId) => {
 
 export const getEpisodeUrl = (server, episodeId, ext = 'mp4') => {
   const { url, username, password } = server
-  return `${url}/series/${username}/${password}/${episodeId}.${ext}`
+  return proxifyUrl(`${url}/series/${username}/${password}/${episodeId}.${ext}`)
 }
 
-// ── EPG ───────────────────────────────────────────────────────
 export const getShortEPG = async (server, streamId, limit = 4) => {
   const { url, username, password } = server
   try {
@@ -113,7 +109,6 @@ export const getShortEPG = async (server, streamId, limit = 4) => {
   }
 }
 
-// ── Helper: testa se servidor está online ─────────────────────
 export const testServer = async (server) => {
   try {
     await authenticate(server)

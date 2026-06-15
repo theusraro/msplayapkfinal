@@ -85,4 +85,7 @@ export const APP_CONFIG = {
   defaultVolume: 0.8,
   cardsPerRow: 6,
   infiniteScrollStep: 20,
+  // Coloque aqui a URL do seu Cloudflare Worker quando for usar como PWA.
+  // Exemplo: 'https://msplay-proxy.seuusuario.workers.dev'
+  proxyUrl: 'https://falling-water-aba0.theusraro.workers.dev',
 }

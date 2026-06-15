@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import ToastContainer from './components/Toast/ToastContainer.jsx'
 import SplashPage from './pages/SplashPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
@@ -21,7 +21,7 @@ const App = () => {
   useRemoteNavigation()
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         {/* Splash */}
         <Route path="/" element={<SplashPage />} />
@@ -42,7 +42,7 @@ const App = () => {
 
       {/* Toast global */}
       <ToastContainer />
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 
