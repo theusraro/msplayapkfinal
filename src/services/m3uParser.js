@@ -35,7 +35,17 @@ export const parseM3UString = (content) => {
       }
     } else if (line.startsWith('http') || line.startsWith('rtmp')) {
       if (current) {
-        items.push({ ...current, url: line, id: `m3u_${items.length}` })
+        const id = `m3u_${items.length}`
+        const extMatch = line.match(/\.([a-z0-9]+)(?:\?|$)/i)
+        items.push({
+          ...current,
+          url: line,
+          id,
+          stream_id: id,
+          stream_icon: current.tvgLogo,
+          category_name: current.group,
+          container_extension: extMatch?.[1] || 'm3u8',
+        })
         current = null
       }
     }

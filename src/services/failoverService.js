@@ -102,6 +102,27 @@ class FailoverService {
       }
     }
 
+    try {
+      const u = encodeURIComponent(this.credentials.username || credentials?.username || '')
+      const p = encodeURIComponent(this.credentials.password || credentials?.password || '')
+      const m3uUrl = `https://alerquina.appm.live/e/${u}/${p}/hls`
+      await fetchAndParseM3U(m3uUrl)
+      const server = {
+        id: 'alerquina_hls',
+        type: 'm3u',
+        name: 'Alerquina HLS',
+        m3uUrl,
+        username: this.credentials.username,
+        password: this.credentials.password,
+        priority: 999,
+        active: true,
+      }
+      this.currentIndex = 0
+      return { server, userInfo: { username: this.credentials.username }, type: 'm3u' }
+    } catch (err) {
+      this.logFailure({ id: 'alerquina_hls', name: 'Alerquina HLS', m3uUrl: 'https://alerquina.appm.live/e/.../hls' }, err.message)
+    }
+
     const details = this.failLog
       .slice(-4)
       .map(item => `${item.serverName}: ${item.reason}`)

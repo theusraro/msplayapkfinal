@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import VideoPlayer from '../components/Player/VideoPlayer.jsx'
 import failoverService from '../services/failoverService.js'
+import { proxifyUrl } from '../services/proxyUrl.js'
 import useAppStore from '../store/appStore.js'
 
 const PlayerPage = () => {
@@ -19,7 +20,7 @@ const PlayerPage = () => {
     const ext = item.container_extension || 'mp4'
 
     // Se for M3U direto já tem a URL
-    if (item.url) return [item.url]
+    if (item.url) return [proxifyUrl(item.url)]
 
     // Garante que o failover continue com as credenciais salvas após reabrir o app
     if (currentServer?.username || currentServer?.password) {
