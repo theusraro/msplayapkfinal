@@ -9,6 +9,7 @@ const ALLOWED_HOSTS = new Set([
   '177.67.82.167',
   '51.222.156.94',
   '135.148.32.77',
+  'alerquina.appm.live',
 ])
 
 const CORS_HEADERS = {
@@ -41,7 +42,7 @@ function getTargetUrl(request) {
     return null
   }
 
-  if (target.protocol !== 'http:') return null
+  if (target.protocol !== 'http:' && target.protocol !== 'https:') return null
   if (!ALLOWED_HOSTS.has(target.hostname)) return null
 
   return target
@@ -71,11 +72,16 @@ export default {
     if (accept) headers.set('Accept', accept)
     if (userAgent) headers.set('User-Agent', userAgent)
 
-    const upstreamResponse = await fetch(target.toString(), {
-      method: request.method,
-      headers,
-      redirect: 'follow',
-    })
+    let upstreamResponse
+    try {
+      upstreamResponse = await fetch(target.toString(), {
+        method: request.method,
+        headers,
+        redirect: 'follow',
+      })
+    } catch (error) {
+      return responseText(`Upstream fetch failed: ${error.message}`, 502)
+    }
 
     const responseHeaders = new Headers(upstreamResponse.headers)
     Object.entries(CORS_HEADERS).forEach(([key, value]) => responseHeaders.set(key, value))

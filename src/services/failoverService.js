@@ -106,12 +106,13 @@ class FailoverService {
       const u = encodeURIComponent(this.credentials.username || credentials?.username || '')
       const p = encodeURIComponent(this.credentials.password || credentials?.password || '')
       const m3uUrl = `https://alerquina.appm.live/e/${u}/${p}/hls`
-      await fetchAndParseM3U(m3uUrl)
+      const proxiedM3uUrl = proxifyUrl(m3uUrl)
+      await fetchAndParseM3U(proxiedM3uUrl)
       const server = {
         id: 'alerquina_hls',
         type: 'm3u',
         name: 'Alerquina HLS',
-        m3uUrl,
+        m3uUrl: proxiedM3uUrl,
         username: this.credentials.username,
         password: this.credentials.password,
         priority: 999,

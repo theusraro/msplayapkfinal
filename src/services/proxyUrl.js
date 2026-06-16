@@ -14,7 +14,11 @@ export const shouldUseProxy = () => {
 
 export const proxifyUrl = (url) => {
   if (!shouldUseProxy()) return url
-  if (!/^http:\/\//i.test(url)) return url
+  if (!/^https?:\/\//i.test(url)) return url
+
+  const parsed = new URL(url)
+  const shouldProxy = parsed.protocol === 'http:' || parsed.hostname === 'alerquina.appm.live'
+  if (!shouldProxy) return url
 
   const proxyBase = APP_CONFIG.proxyUrl.replace(/\/+$/, '')
   return `${proxyBase}/?url=${encodeURIComponent(url)}`

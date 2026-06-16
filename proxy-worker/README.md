@@ -4,6 +4,8 @@ Este proxy existe para o PWA acessar servidores Xtream HTTP a partir de um site 
 
 Use apenas com servidores e credenciais autorizados. O proxy aceita somente os hosts listados em `ALLOWED_HOSTS` no arquivo `worker.js`.
 
+Importante: se voce ja criou o Worker, cole novamente o conteudo atualizado de `worker.js` no painel do Cloudflare e clique em `Deploy`.
+
 ## Como publicar no Cloudflare Workers
 
 1. Crie uma conta em https://dash.cloudflare.com
