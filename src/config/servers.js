@@ -71,38 +71,6 @@ export const SERVERS = [
     priority: 9,
     active: true,
   },
-  {
-    id: 10,
-    type: 'xtream',
-    name: 'STB Smart UP 1',
-    url: 'http://209.14.2.198',
-    priority: 10,
-    active: true,
-  },
-  {
-    id: 11,
-    type: 'xtream',
-    name: 'STB Smart UP 2',
-    url: 'http://177.67.82.167',
-    priority: 11,
-    active: true,
-  },
-  {
-    id: 12,
-    type: 'xtream',
-    name: 'STB Smart UP 3',
-    url: 'http://51.222.156.94',
-    priority: 12,
-    active: true,
-  },
-  {
-    id: 13,
-    type: 'xtream',
-    name: 'STB Smart UP 4',
-    url: 'http://135.148.32.77',
-    priority: 13,
-    active: true,
-  },
 ]
 
 export const FAILOVER_CONFIG = {

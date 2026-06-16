@@ -1,6 +1,5 @@
 import { SERVERS, FAILOVER_CONFIG } from '../config/servers.js'
 import { authenticate } from './xtreamApi.js'
-import { fetchAndParseM3U } from './m3uParser.js'
 import { proxifyUrl } from './proxyUrl.js'
 
 const delay = (ms) => new Promise(res => setTimeout(res, ms))
@@ -76,17 +75,6 @@ class FailoverService {
     for (let i = 0; i < targets.length; i++) {
       const server = targets[i]
 
-      if (server.type === 'm3u') {
-        try {
-          await fetchAndParseM3U(server.m3uUrl)
-          this.currentIndex = this.servers.findIndex(s => s.id === server.id)
-          return { server, type: 'm3u' }
-        } catch (err) {
-          this.logFailure(server, err.message)
-          continue
-        }
-      }
-
       for (let attempt = 0; attempt < FAILOVER_CONFIG.maxRetries; attempt++) {
         try {
           const data = await authenticate(server)
@@ -100,28 +88,6 @@ class FailoverService {
           }
         }
       }
-    }
-
-    try {
-      const u = encodeURIComponent(this.credentials.username || credentials?.username || '')
-      const p = encodeURIComponent(this.credentials.password || credentials?.password || '')
-      const m3uUrl = `https://alerquina.appm.live/e/${u}/${p}/hls`
-      const proxiedM3uUrl = proxifyUrl(m3uUrl)
-      await fetchAndParseM3U(proxiedM3uUrl)
-      const server = {
-        id: 'alerquina_hls',
-        type: 'm3u',
-        name: 'Alerquina HLS',
-        m3uUrl: proxiedM3uUrl,
-        username: this.credentials.username,
-        password: this.credentials.password,
-        priority: 999,
-        active: true,
-      }
-      this.currentIndex = 0
-      return { server, userInfo: { username: this.credentials.username }, type: 'm3u' }
-    } catch (err) {
-      this.logFailure({ id: 'alerquina_hls', name: 'Alerquina HLS', m3uUrl: 'https://alerquina.appm.live/e/.../hls' }, err.message)
     }
 
     const details = this.failLog

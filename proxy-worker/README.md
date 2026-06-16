@@ -1,6 +1,7 @@
-# MSPlay HTTPS Proxy
+# MSPlay Xtream HTTPS Proxy
 
 Este proxy existe para o PWA acessar servidores Xtream HTTP a partir de um site HTTPS.
+Ele nao usa o web player da Alerquina como fonte. Ele apenas encaminha chamadas para os DNS Xtream configurados no app.
 
 Use apenas com servidores e credenciais autorizados. O proxy aceita somente os hosts listados em `ALLOWED_HOSTS` no arquivo `worker.js`.
 
@@ -48,7 +49,7 @@ E publique novamente no GitHub Pages.
 Troque `USUARIO` e `SENHA` pelos dados reais:
 
 ```txt
-https://msplay-proxy.seuusuario.workers.dev/?url=http%3A%2F%2Falerquinaz.top%3A80%2Fplayer_api.php%3Fusername%3DUSUARIO%26password%3DSENHA
+https://msplay-proxy.seuusuario.workers.dev/?url=http%3A%2F%2Fnewxczs.top%3A80%2Fplayer_api.php%3Fusername%3DUSUARIO%26password%3DSENHA
 ```
 
 Se retornar JSON com `user_info`, o proxy esta funcionando.

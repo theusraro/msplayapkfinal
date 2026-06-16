@@ -5,11 +5,6 @@ const ALLOWED_HOSTS = new Set([
   'p2golld.top',
   'zed3.top',
   'prbfeliz.top',
-  '209.14.2.198',
-  '177.67.82.167',
-  '51.222.156.94',
-  '135.148.32.77',
-  'alerquina.appm.live',
 ])
 
 const CORS_HEADERS = {
@@ -42,7 +37,7 @@ function getTargetUrl(request) {
     return null
   }
 
-  if (target.protocol !== 'http:' && target.protocol !== 'https:') return null
+  if (target.protocol !== 'http:') return null
   if (!ALLOWED_HOSTS.has(target.hostname)) return null
 
   return target
