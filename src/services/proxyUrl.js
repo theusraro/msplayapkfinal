@@ -9,7 +9,8 @@ export const shouldUseProxy = () => {
   const isCapacitor = window.Capacitor || window.location.protocol === 'capacitor:'
   if (isCapacitor) return false
 
-  return window.location.protocol === 'https:'
+  const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+  return window.location.protocol === 'https:' || isLocalhost
 }
 
 export const proxifyUrl = (url) => {
@@ -17,5 +18,6 @@ export const proxifyUrl = (url) => {
   if (!/^http:\/\//i.test(url)) return url
 
   const proxyBase = APP_CONFIG.proxyUrl.replace(/\/+$/, '')
+  if (url.startsWith(proxyBase)) return url
   return `${proxyBase}/?url=${encodeURIComponent(url)}`
 }

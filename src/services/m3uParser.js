@@ -38,13 +38,15 @@ export const parseM3UString = (content) => {
       }
     } else if (line.startsWith('http') || line.startsWith('rtmp')) {
       if (current) {
-        const id = `m3u_${items.length}`
+        const streamIdMatch = line.match(/\/(?:live|movie|series)\/[^/]+\/[^/]+\/(\d+)(?:\.[a-z0-9]+)?(?:\?|$)/i)
+        const id = streamIdMatch?.[1] || `m3u_${items.length}`
         const extMatch = line.match(/\.([a-z0-9]+)(?:\?|$)/i)
         items.push({
           ...current,
           url: line,
           id,
           stream_id: id,
+          source: 'm3u',
           stream_icon: current.tvgLogo,
           category_name: current.group,
           container_extension: extMatch?.[1] || 'm3u8',
@@ -71,13 +73,28 @@ export const groupByCategory = (items) => {
 export const fetchAndParseM3U = async (url) => {
   if (!m3uCache[url]) {
     m3uCache[url] = axios.get(proxifyUrl(url), {
-      timeout: 15000,
+      timeout: 60000,
       responseType: 'text',
       headers: { 'User-Agent': 'MSPlay/1.0' },
     }).then(response => parseM3UString(response.data))
   }
 
   return m3uCache[url]
+}
+
+export const validateM3UUrl = async (url) => {
+  const checkUrl = url.replace('/m3u?', '/m3u-check?')
+
+  if (checkUrl !== url) {
+    const response = await axios.get(checkUrl, {
+      timeout: 15000,
+      responseType: 'json',
+    })
+    return Boolean(response.data?.ok)
+  }
+
+  const items = await fetchAndParseM3U(url)
+  return items.length > 0
 }
 
 // Parse de arquivo M3U local (File object do input)

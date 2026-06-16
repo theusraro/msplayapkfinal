@@ -1,6 +1,6 @@
-import { SERVERS, FAILOVER_CONFIG } from '../config/servers.js'
+import { SERVERS, FAILOVER_CONFIG, APP_CONFIG } from '../config/servers.js'
 import { authenticate } from './xtreamApi.js'
-import { fetchAndParseM3U } from './m3uParser.js'
+import { validateM3UUrl } from './m3uParser.js'
 import { proxifyUrl } from './proxyUrl.js'
 
 const delay = (ms) => new Promise(res => setTimeout(res, ms))
@@ -29,6 +29,7 @@ class FailoverService {
           username: this.credentials.username,
           password: this.credentials.password,
           m3uUrl: `${server.m3uUrl || ''}`
+            .replaceAll('{proxy}', APP_CONFIG.proxyUrl.replace(/\/+$/, ''))
             .replaceAll('{username}', encodeURIComponent(this.credentials.username))
             .replaceAll('{password}', encodeURIComponent(this.credentials.password)),
         }
@@ -90,8 +91,8 @@ class FailoverService {
       for (let attempt = 0; attempt < FAILOVER_CONFIG.maxRetries; attempt++) {
         try {
           if (server.type === 'm3u') {
-            const items = await fetchAndParseM3U(server.m3uUrl)
-            if (!items.length) throw new Error('Lista M3U vazia')
+            const valid = await validateM3UUrl(server.m3uUrl)
+            if (!valid) throw new Error('Lista M3U invalida')
 
             this.currentIndex = this.servers.findIndex(s => s.id === server.id)
             return {
@@ -100,7 +101,7 @@ class FailoverService {
                 username: this.credentials.username,
                 auth: 1,
                 status: 'Active',
-                message: `${items.length} itens carregados via M3U`,
+                message: 'Playlist M3U validada',
               },
               type: 'm3u',
             }

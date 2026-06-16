@@ -1,0 +1,3 @@
+name = "falling-water-aba0"
+main = "proxy-worker/worker.js"
+compatibility_date = "2026-06-16"
