@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'msplay-pwa-v3'
+const CACHE_VERSION = 'msplay-pwa-v4'
 const APP_SHELL = [
   './',
   './index.html',

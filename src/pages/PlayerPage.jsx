@@ -19,8 +19,11 @@ const PlayerPage = () => {
     const id = item.stream_id || item.episode_id || item.id
     const ext = item.container_extension || 'mp4'
 
-    // Se for M3U direto já tem a URL
-    if (item.url) return [proxifyUrl(item.url)]
+    // Se for M3U direto, tenta proxy no PWA e URL original no APK/WebView.
+    if (item.url) {
+      const proxiedUrl = proxifyUrl(item.url)
+      return [...new Set([proxiedUrl, item.url])]
+    }
 
     // Garante que o failover continue com as credenciais salvas após reabrir o app
     if (currentServer?.username || currentServer?.password) {
