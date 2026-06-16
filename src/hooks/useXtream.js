@@ -31,7 +31,14 @@ const useXtream = (action, params = {}) => {
   const [error, setError] = useState(null)
   const { currentServer, addToast } = useAppStore()
 
-  const cacheKey = `${action}_${JSON.stringify(params)}_${currentServer?.id}_${currentServer?.type}`
+  const cacheKey = [
+    action,
+    JSON.stringify(params),
+    currentServer?.id,
+    currentServer?.type,
+    currentServer?.username,
+    currentServer?.m3uUrl,
+  ].join('_')
 
   const fetch = useCallback(async () => {
     if (!currentServer) {

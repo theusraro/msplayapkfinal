@@ -71,12 +71,36 @@ export const SERVERS = [
     priority: 9,
     active: true,
   },
+  {
+    id: 10,
+    type: 'm3u',
+    name: 'M3U Parceiros',
+    m3uUrl: 'http://appez.top/get.php?username={username}&password={password}&type=m3u_plus&output=ts',
+    priority: 10,
+    active: true,
+  },
+  {
+    id: 11,
+    type: 'm3u',
+    name: 'M3U Alerquina',
+    m3uUrl: 'http://alerquinaz.top/get.php?username={username}&password={password}&type=m3u_plus&output=mpegts',
+    priority: 11,
+    active: true,
+  },
+  {
+    id: 12,
+    type: 'm3u',
+    name: 'HLS Alerquina',
+    m3uUrl: 'http://alerquinaz.top/get.php?username={username}&password={password}&type=m3u_plus&output=m3u8',
+    priority: 12,
+    active: true,
+  },
 ]
 
 export const FAILOVER_CONFIG = {
-  timeoutMs: 8000,
+  timeoutMs: 6000,
   stallTimeoutMs: 1200,
-  maxRetries: 2,
+  maxRetries: 1,
   retryDelayMs: 1000,
   autoSwitch: true,
   showNotification: true,

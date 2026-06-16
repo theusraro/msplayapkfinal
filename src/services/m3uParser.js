@@ -1,4 +1,7 @@
 import axios from 'axios'
+import { proxifyUrl } from './proxyUrl.js'
+
+const m3uCache = {}
 
 // Faz parse de uma string M3U e retorna lista de canais/conteúdos
 export const parseM3UString = (content) => {
@@ -66,12 +69,15 @@ export const groupByCategory = (items) => {
 
 // Busca e faz parse de uma URL M3U remota
 export const fetchAndParseM3U = async (url) => {
-  const response = await axios.get(url, {
-    timeout: 15000,
-    responseType: 'text',
-    headers: { 'User-Agent': 'MSPlay/1.0' },
-  })
-  return parseM3UString(response.data)
+  if (!m3uCache[url]) {
+    m3uCache[url] = axios.get(proxifyUrl(url), {
+      timeout: 15000,
+      responseType: 'text',
+      headers: { 'User-Agent': 'MSPlay/1.0' },
+    }).then(response => parseM3UString(response.data))
+  }
+
+  return m3uCache[url]
 }
 
 // Parse de arquivo M3U local (File object do input)

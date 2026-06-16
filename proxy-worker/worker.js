@@ -5,6 +5,7 @@ const ALLOWED_HOSTS = new Set([
   'p2golld.top',
   'zed3.top',
   'prbfeliz.top',
+  'appez.top',
 ])
 
 const CORS_HEADERS = {
