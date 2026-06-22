@@ -1,5 +1,6 @@
 const ALLOWED_HOSTS = new Set([
   'alerquina.appm.live',
+  '79.127.137.68',
   'esma26.top',
   'alerquinaz.top',
   'newxczs.top',
@@ -53,12 +54,17 @@ function getAlerquinaPlaylistUrl(request) {
   const username = requestUrl.searchParams.get('username')?.trim()
   const password = requestUrl.searchParams.get('password')?.trim()
   const type = requestUrl.searchParams.get('type') === 'm3u' ? 'm3u' : 'hls'
+  const output = type === 'm3u' ? 'mpegts' : 'm3u8'
 
   if (!username || !password) return null
 
-  return new URL(
-    `https://alerquina.appm.live/e/${encodeURIComponent(username)}/${encodeURIComponent(password)}/${type}`
-  )
+  const target = new URL('http://79.127.137.68/get.php')
+  target.searchParams.set('username', username)
+  target.searchParams.set('password', password)
+  target.searchParams.set('type', 'm3u_plus')
+  target.searchParams.set('output', output)
+
+  return target
 }
 
 async function proxyRequest(request, target) {

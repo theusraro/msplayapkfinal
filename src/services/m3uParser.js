@@ -2,6 +2,11 @@ import axios from 'axios'
 import { proxifyUrl } from './proxyUrl.js'
 
 const m3uCache = {}
+const normalizeStreamUrl = (url) => (
+  url
+    .replace(/^http:\/\/alerquinaz\.top(?=\/)/i, 'http://79.127.137.68')
+    .replace(/^http:\/\/alerquinaz\.top:80(?=\/)/i, 'http://79.127.137.68')
+)
 
 // Faz parse de uma string M3U e retorna lista de canais/conteúdos
 export const parseM3UString = (content) => {
@@ -38,12 +43,13 @@ export const parseM3UString = (content) => {
       }
     } else if (line.startsWith('http') || line.startsWith('rtmp')) {
       if (current) {
-        const streamIdMatch = line.match(/\/(?:live|movie|series)\/[^/]+\/[^/]+\/(\d+)(?:\.[a-z0-9]+)?(?:\?|$)/i)
+        const normalizedUrl = normalizeStreamUrl(line)
+        const streamIdMatch = normalizedUrl.match(/\/(?:live|movie|series)\/[^/]+\/[^/]+\/(\d+)(?:\.[a-z0-9]+)?(?:\?|$)/i)
         const id = streamIdMatch?.[1] || `m3u_${items.length}`
-        const extMatch = line.match(/\.([a-z0-9]+)(?:\?|$)/i)
+        const extMatch = normalizedUrl.match(/\.([a-z0-9]+)(?:\?|$)/i)
         items.push({
           ...current,
-          url: line,
+          url: normalizedUrl,
           id,
           stream_id: id,
           source: 'm3u',
@@ -86,11 +92,16 @@ export const validateM3UUrl = async (url) => {
   const checkUrl = url.replace('/m3u?', '/m3u-check?')
 
   if (checkUrl !== url) {
-    const response = await axios.get(checkUrl, {
-      timeout: 15000,
-      responseType: 'json',
-    })
-    return Boolean(response.data?.ok)
+    try {
+      const response = await axios.get(checkUrl, {
+        timeout: 15000,
+        responseType: 'json',
+      })
+      return Boolean(response.data?.ok)
+    } catch {
+      const items = await fetchAndParseM3U(url)
+      return items.length > 0
+    }
   }
 
   const items = await fetchAndParseM3U(url)

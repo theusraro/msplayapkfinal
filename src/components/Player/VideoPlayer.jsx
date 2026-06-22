@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { formatDuration } from '../../utils/helpers.js'
 import { FAILOVER_CONFIG } from '../../config/servers.js'
+import { proxifyUrl, shouldUseProxy } from '../../services/proxyUrl.js'
 import useAppStore from '../../store/appStore.js'
 
 const VideoPlayer = ({ urls = [], title = '', type = 'live', onBack, onProgress }) => {
@@ -134,14 +135,14 @@ const VideoPlayer = ({ urls = [], title = '', type = 'live', onBack, onProgress 
     }, FAILOVER_CONFIG.timeoutMs + 4000)
 
     if (isHlsUrl && canUseNativeHls()) {
-      video.src = url
+      video.src = proxifyUrl(url)
       video.load()
       playVideo()
       return
     }
 
     if (isHlsUrl && Hls.isSupported()) {
-      const hls = new Hls({
+      const hlsConfig = {
         enableWorker: true,
         lowLatencyMode: true,
         backBufferLength: 60,
@@ -151,10 +152,21 @@ const VideoPlayer = ({ urls = [], title = '', type = 'live', onBack, onProgress 
         manifestLoadingMaxRetry: 1,
         levelLoadingMaxRetry: 1,
         fragLoadingMaxRetry: 1,
-      })
+      }
+
+      if (shouldUseProxy()) {
+        hlsConfig.xhrSetup = (xhr, requestUrl) => {
+          const proxiedUrl = proxifyUrl(requestUrl)
+          if (proxiedUrl !== requestUrl) {
+            xhr.open('GET', proxiedUrl, true)
+          }
+        }
+      }
+
+      const hls = new Hls(hlsConfig)
 
       hlsRef.current = hls
-      hls.loadSource(url)
+      hls.loadSource(proxifyUrl(url))
       hls.attachMedia(video)
 
       hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
@@ -177,7 +189,7 @@ const VideoPlayer = ({ urls = [], title = '', type = 'live', onBack, onProgress 
     // Links Xtream de TV ao vivo geralmente vêm em TS ou stream direto.
     // No APK/WebView Android o player nativo costuma tocar esses links melhor
     // do que tentar forçar HLS em uma URL que não é .m3u8.
-    video.src = url
+    video.src = proxifyUrl(url)
     video.load()
     playVideo()
   }, [urls, cleanupCurrentStream, playVideo, tryNextServer, canUseNativeHls])
